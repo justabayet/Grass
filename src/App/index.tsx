@@ -1,5 +1,9 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import Ground from './Ground'
+import Grass from './Grass'
+import { Perf } from 'r3f-perf'
+import Blade from './Blade'
 
 function App(): JSX.Element {
   return (
@@ -11,11 +15,16 @@ function App(): JSX.Element {
         position: [- 4, 3, 6]
       }}
     >
-      <mesh>
-        <boxGeometry></boxGeometry>
-        <meshBasicMaterial color={'white'}></meshBasicMaterial>
-      </mesh>
+      <Grass boundaries={[-2, 2, -2, 2]} />
+
+      <Blade position={[0, 0, 0]} />
+
+      <Ground position={[0, 0, 0]} />
       <OrbitControls />
+
+      <Perf position="top-left" />
+
+      <axesHelper />
     </Canvas>
   )
 }
