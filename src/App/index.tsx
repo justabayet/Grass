@@ -1,6 +1,5 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import Ground from './Ground'
 import Grass from './Grass'
 import { Perf } from 'r3f-perf'
 
