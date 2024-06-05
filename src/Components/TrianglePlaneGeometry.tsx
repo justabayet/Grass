@@ -51,7 +51,7 @@ function getVertices(
 ): {
   positions: Float32Array,
   normals: Float32Array,
-  indices: Float32Array
+  indices: Uint16Array
 } {
   const positions: number[] = []
 
@@ -153,6 +153,6 @@ function getVertices(
   return {
     positions: new Float32Array(newPositions),
     normals: new Float32Array(normals),
-    indices: new Float32Array(indices)
+    indices: new Uint16Array(indices)
   }
 }
