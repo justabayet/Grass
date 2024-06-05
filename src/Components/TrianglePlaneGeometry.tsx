@@ -13,7 +13,7 @@ function TrianglePlaneGeometry({
 }: TrianglePlaneGeometryProps): JSX.Element {
   if (nbVSegments < 1) throw new Error(`At least one segment is required: nbVSegments=${nbVSegments}`)
 
-  const { positions, normals, indices } = useMemo(() => {
+  const { positions, normals, indices, uvs } = useMemo(() => {
     return getVertices(width, height, nbVSegments)
   }, [width, height, nbVSegments])
 
@@ -32,10 +32,16 @@ function TrianglePlaneGeometry({
         itemSize={3}
       />
       <bufferAttribute
-        attach="index"
+        attach='index'
         array={indices}
         count={indices.length}
         itemSize={1}
+      />
+      <bufferAttribute
+        attach='attributes-uv'
+        array={uvs}
+        count={uvs.length / 2}
+        itemSize={2}
       />
     </bufferGeometry>
   )
@@ -51,7 +57,8 @@ function getVertices(
 ): {
   positions: Float32Array,
   normals: Float32Array,
-  indices: Uint16Array
+  indices: Uint16Array,
+  uvs: Float32Array
 } {
   const positions: number[] = []
 
@@ -116,6 +123,7 @@ function getVertices(
   positions.push(0)
 
   const newPositions: number[] = []
+  const uvs: number[] = []
   const indicesDic: { [id: string]: number } = {}
   const indices: number[] = []
 
@@ -130,17 +138,16 @@ function getVertices(
 
     const id = `${x.toFixed(3)}:${y.toFixed(3)}:${z.toFixed(3)}`
 
-    if (id in indicesDic) {
-      indices.push(indicesDic[id])
-    } else {
+    if (!(id in indicesDic)) {
       const newIndex = newPositions.length / 3
 
       newPositions.push(x, y, z)
+      uvs.push((x / width) + 0.5, y / height)
 
       indicesDic[id] = newIndex
-
-      indices.push(indicesDic[id])
     }
+
+    indices.push(indicesDic[id])
   }
 
   const normals = (new Array(newPositions.length))
@@ -153,6 +160,7 @@ function getVertices(
   return {
     positions: new Float32Array(newPositions),
     normals: new Float32Array(normals),
-    indices: new Uint16Array(indices)
+    indices: new Uint16Array(indices),
+    uvs: new Float32Array(uvs),
   }
 }
