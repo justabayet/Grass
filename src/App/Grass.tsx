@@ -1,20 +1,28 @@
 import { InstancedMeshProps, ReactThreeFiber, useFrame } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
-import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, } from 'three'
+import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, } from 'three'
 import TrianglePlaneGeometry from '../Components/TrianglePlaneGeometry'
 import { extend } from '@react-three/fiber'
 
 import grassVertexShader from './shaders/grass/vertex.glsl'
 import grassFragmentShader from './shaders/grass/fragment.glsl'
 import { shaderMaterial } from '@react-three/drei'
+import { useControls } from 'leva'
 
 interface GrassMaterial extends ShaderMaterial {
   uTime: number
+  uBaseColor: Color
+  uTipColor: Color
 }
+
+const defaultBaseColor = new Color(0.3, .0, 1.0)
+const defaultTipColor = new Color(1.0, .7, 1.0)
 
 const GrassMaterial = shaderMaterial(
   {
-    uTime: 0
+    uTime: 0,
+    uBaseColor: defaultBaseColor,
+    uTipColor: defaultTipColor
   },
   grassVertexShader,
   grassFragmentShader
@@ -39,6 +47,15 @@ interface GrassProps extends InstancedMeshProps {
 function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
   const blades = useRef<InstancedMesh>(null)
   const grassMaterial = useRef<GrassMaterial>(null)
+  const { baseColor, tipColor } = useControls({
+    baseColor: `#${defaultBaseColor.getHexString()}`,
+    tipColor: `#${defaultTipColor.getHexString()}`
+  })
+
+  if (grassMaterial.current != null) {
+    grassMaterial.current.uBaseColor = new Color(baseColor)
+    grassMaterial.current.uTipColor = new Color(tipColor)
+  }
 
   useFrame((_, delta) => {
     if (grassMaterial.current != null) {

@@ -16,7 +16,7 @@ function App(): JSX.Element {
 
       <Grass boundaries={[-2, 2, -2, 2]} count={1 * 1000} />
 
-      <Ground position={[0, 0, 0]} />
+      {/* <Ground position={[0, 0, 0]} /> */}
       <OrbitControls />
 
       <Perf position="top-left" />

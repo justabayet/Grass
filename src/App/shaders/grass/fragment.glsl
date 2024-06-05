@@ -1,8 +1,9 @@
 varying vec2 vUv;
-varying float uRedExtra;
+uniform vec3 uBaseColor;
+uniform vec3 uTipColor;
 
 void main()
 {
-    gl_FragColor = vec4(1.0, (vUv.y * 0.6 + uRedExtra), 0.0, 1.0);
+    gl_FragColor = vec4(mix(uBaseColor, uTipColor, vUv.y), 1.0);
     #include <colorspace_fragment>;
 }
