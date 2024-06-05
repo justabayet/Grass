@@ -1,7 +1,7 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import Grass from './Grass'
-import { Perf } from 'r3f-perf'
+// import { Perf } from 'r3f-perf'
 
 function App(): JSX.Element {
   return (
@@ -18,7 +18,7 @@ function App(): JSX.Element {
       {/* <Ground position={[0, 0, 0]} /> */}
       <OrbitControls />
 
-      <Perf position="top-left" />
+      {/* <Perf position="top-left" /> */}
     </Canvas>
   )
 }
