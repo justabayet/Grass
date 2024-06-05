@@ -4,5 +4,18 @@ import glsl from 'vite-plugin-glsl'
 
 export default defineConfig({
   plugins: [react(), glsl()],
-  base: '/'
+  base: '/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-dom': ['react-dom'],
+          '@react-three/fiber': ['@react-three/fiber'],
+          '@react-three/drei': ['@react-three/drei'],
+          'three': ['three']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 700
+  }
 })
