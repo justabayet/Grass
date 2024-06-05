@@ -3,7 +3,6 @@ import { Canvas } from '@react-three/fiber'
 import Ground from './Ground'
 import Grass from './Grass'
 import { Perf } from 'r3f-perf'
-import Blade from './Blade'
 
 function App(): JSX.Element {
   return (
@@ -13,18 +12,14 @@ function App(): JSX.Element {
         near: 0.1,
         far: 200,
         position: [- 4, 3, 6]
-      }}
-    >
-      <Grass boundaries={[-2, 2, -2, 2]} />
+      }} >
 
-      <Blade position={[0, 0, 0]} />
+      <Grass boundaries={[-2, 2, -2, 2]} count={1 * 1000} />
 
       <Ground position={[0, 0, 0]} />
       <OrbitControls />
 
       <Perf position="top-left" />
-
-      <axesHelper />
     </Canvas>
   )
 }

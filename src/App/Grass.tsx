@@ -1,7 +1,35 @@
-import { InstancedMeshProps } from '@react-three/fiber'
+import { InstancedMeshProps, ReactThreeFiber, useFrame } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
-import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide } from 'three'
+import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, } from 'three'
 import TrianglePlaneGeometry from '../Components/TrianglePlaneGeometry'
+import { extend } from '@react-three/fiber'
+
+import grassVertexShader from './shaders/grass/vertex.glsl'
+import grassFragmentShader from './shaders/grass/fragment.glsl'
+import { shaderMaterial } from '@react-three/drei'
+
+interface GrassMaterial extends ShaderMaterial {
+  uTime: number
+}
+
+const GrassMaterial = shaderMaterial(
+  {
+    uTime: 0
+  },
+  grassVertexShader,
+  grassFragmentShader
+)
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      grassMaterial: ReactThreeFiber.Object3DNode<GrassMaterial, typeof GrassMaterial>
+    }
+  }
+}
+
+extend({ GrassMaterial })
 
 interface GrassProps extends InstancedMeshProps {
   boundaries: [number, number, number, number]
@@ -10,6 +38,13 @@ interface GrassProps extends InstancedMeshProps {
 
 function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
   const blades = useRef<InstancedMesh>(null)
+  const grassMaterial = useRef<GrassMaterial>(null)
+
+  useFrame((_, delta) => {
+    if (grassMaterial.current != null) {
+      grassMaterial.current.uTime += delta
+    }
+  })
 
   useEffect(() => {
     const width = boundaries[1] - boundaries[0]
@@ -33,7 +68,9 @@ function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
   return (
     <instancedMesh {...props} ref={blades} args={[undefined, undefined, count]}>
       <TrianglePlaneGeometry nbVSegments={3} />
-      <meshBasicMaterial color="tomato" side={DoubleSide} />
+      <grassMaterial
+        ref={grassMaterial}
+        side={DoubleSide} />
     </instancedMesh>
   )
 }
