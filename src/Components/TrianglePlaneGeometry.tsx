@@ -13,7 +13,7 @@ function TrianglePlaneGeometry({
 }: TrianglePlaneGeometryProps): JSX.Element {
   if (nbVSegments < 1) throw new Error(`At least one segment is required: nbVSegments=${nbVSegments}`)
 
-  const positions = useMemo(() => {
+  const { positions, normals, indices } = useMemo(() => {
     return getVertices(width, height, nbVSegments)
   }, [width, height, nbVSegments])
 
@@ -25,6 +25,18 @@ function TrianglePlaneGeometry({
         count={positions.length / 3}
         itemSize={3}
       />
+      <bufferAttribute
+        attach='attributes-normal'
+        array={normals}
+        count={normals.length / 3}
+        itemSize={3}
+      />
+      <bufferAttribute
+        attach="index"
+        array={indices}
+        count={indices.length}
+        itemSize={1}
+      />
     </bufferGeometry>
   )
 }
@@ -32,8 +44,16 @@ function TrianglePlaneGeometry({
 export default TrianglePlaneGeometry
 
 
-function getVertices(width: number, height: number, nbVSegments: number): Float32Array {
-  const vertices: number[] = []
+function getVertices(
+  width: number,
+  height: number,
+  nbVSegments: number
+): {
+  positions: Float32Array,
+  normals: Float32Array,
+  indices: Float32Array
+} {
+  const positions: number[] = []
 
   const nbLayers = nbVSegments - 1 // Remove tip
 
@@ -54,47 +74,85 @@ function getVertices(width: number, height: number, nbVSegments: number): Float3
 
     // Triangle 1
     //    bot left
-    vertices.push(leftBotX)
-    vertices.push(botY)
-    vertices.push(0)
-    //    top left
-    vertices.push(leftTopX)
-    vertices.push(topY)
-    vertices.push(0)
+    positions.push(leftBotX)
+    positions.push(botY)
+    positions.push(0)
+    //    bot right
+    positions.push(rightBotX)
+    positions.push(botY)
+    positions.push(0)
     //    top right
-    vertices.push(rightTopX)
-    vertices.push(topY)
-    vertices.push(0)
+    positions.push(rightTopX)
+    positions.push(topY)
+    positions.push(0)
 
     // Triangle 2
     //    bot left
-    vertices.push(leftBotX)
-    vertices.push(botY)
-    vertices.push(0)
+    positions.push(leftBotX)
+    positions.push(botY)
+    positions.push(0)
     //    top right
-    vertices.push(rightTopX)
-    vertices.push(topY)
-    vertices.push(0)
-    //    bot right
-    vertices.push(rightBotX)
-    vertices.push(botY)
-    vertices.push(0)
+    positions.push(rightTopX)
+    positions.push(topY)
+    positions.push(0)
+    //    top left
+    positions.push(leftTopX)
+    positions.push(topY)
+    positions.push(0)
   }
-
 
   // Tip
   //    bot left
-  vertices.push(- xDifference)
-  vertices.push(height - layerHeight)
-  vertices.push(0)
+  positions.push(- xDifference)
+  positions.push(height - layerHeight)
+  positions.push(0)
   //    bot right
-  vertices.push(xDifference)
-  vertices.push(height - layerHeight)
-  vertices.push(0)
+  positions.push(xDifference)
+  positions.push(height - layerHeight)
+  positions.push(0)
   //    top middle
-  vertices.push(0)
-  vertices.push(height)
-  vertices.push(0)
+  positions.push(0)
+  positions.push(height)
+  positions.push(0)
 
-  return new Float32Array(vertices)
+  const newPositions: number[] = []
+  const indicesDic: { [id: string]: number } = {}
+  const indices: number[] = []
+
+  for (let i = 0; i < positions.length / 3; i++) {
+    const i1 = i * 3
+    const i2 = i1 + 1
+    const i3 = i1 + 2
+
+    const x = positions[i1]
+    const y = positions[i2]
+    const z = positions[i3]
+
+    const id = `${x.toFixed(3)}:${y.toFixed(3)}:${z.toFixed(3)}`
+
+    if (id in indicesDic) {
+      indices.push(indicesDic[id])
+    } else {
+      const newIndex = newPositions.length / 3
+
+      newPositions.push(x, y, z)
+
+      indicesDic[id] = newIndex
+
+      indices.push(indicesDic[id])
+    }
+  }
+
+  const normals = (new Array(newPositions.length))
+    .fill(0)
+    .map((_, index) => {
+      if ((index + 1) % 3 === 0) return 1
+      return 0
+    })
+
+  return {
+    positions: new Float32Array(newPositions),
+    normals: new Float32Array(normals),
+    indices: new Float32Array(indices)
+  }
 }
