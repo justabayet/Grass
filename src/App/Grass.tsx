@@ -75,9 +75,11 @@ function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
       const offsetWidth = Math.random() * width
       const offsetHeight = Math.random() * height
 
+      const rotationFactor = (Math.random() - 0.5) * 1
+
       matrix.compose(
         new Vector3(boundaries[0] + offsetWidth, 0, boundaries[2] + offsetHeight),
-        new Quaternion().setFromEuler(new Euler(Math.PI / 2)),
+        new Quaternion().setFromEuler(new Euler(0, Math.PI * rotationFactor / 2, 0)),
         new Vector3(1, 1, 1)
       )
       blades.current!.setMatrixAt(i, matrix)
