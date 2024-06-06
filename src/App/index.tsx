@@ -1,10 +1,9 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import Grass from './Grass'
 // import { Perf } from 'r3f-perf'
+import Experience from './Experience'
 
 function App(): JSX.Element {
-  const size = 20
   return (
     <Canvas
       camera={{
@@ -13,10 +12,7 @@ function App(): JSX.Element {
         far: 200,
         position: [- 4, 3, 6]
       }} >
-
-      <Grass boundaries={[-size / 2, size / 2, -size / 2, size / 2]} count={10 * 1000} />
-
-      {/* <Ground position={[0, 0, 0]} /> */}
+      <Experience />
       <OrbitControls />
 
       {/* <Perf position="top-left" /> */}

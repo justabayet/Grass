@@ -1,6 +1,6 @@
 import { InstancedMeshProps, ReactThreeFiber, useFrame } from '@react-three/fiber'
 import { useLayoutEffect, useRef } from 'react'
-import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture, Euler } from 'three'
+import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture } from 'three'
 import TrianglePlaneGeometry from '../Components/TrianglePlaneGeometry'
 import { extend } from '@react-three/fiber'
 
@@ -42,11 +42,15 @@ declare global {
 extend({ GrassMaterial })
 
 interface GrassProps extends InstancedMeshProps {
-  boundaries: [number, number, number, number]
-  count?: number
+  instances: {
+    translation: Vector3
+    rotation: Quaternion
+    scale: Vector3
+  }[]
+  nbVSegments: number
 }
 
-function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
+function Grass({ instances, nbVSegments, ...props }: GrassProps): JSX.Element {
   const blades = useRef<InstancedMesh>(null)
   const grassMaterial = useRef<GrassMaterial>(null)
   const { baseColor, tipColor } = useControls({
@@ -59,36 +63,27 @@ function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
     texture.wrapT = RepeatWrapping
   })
 
-  useFrame((_, delta) => {
+  useFrame(({ clock }) => {
     if (grassMaterial.current != null) {
-      grassMaterial.current.uTime += delta
+      grassMaterial.current.uTime = clock.elapsedTime
     }
   })
 
   useLayoutEffect(() => {
-    const width = boundaries[1] - boundaries[0]
-    const height = boundaries[3] - boundaries[2]
-
-    for (let i = 0; i < count; i++) {
+    let i = 0
+    for (const { translation, rotation, scale } of instances) {
       const matrix = new Matrix4()
 
-      const offsetWidth = Math.random() * width
-      const offsetHeight = Math.random() * height
-
-      const rotationFactor = (Math.random() - 0.5) * 1
-
-      matrix.compose(
-        new Vector3(boundaries[0] + offsetWidth, 0, boundaries[2] + offsetHeight),
-        new Quaternion().setFromEuler(new Euler(0, Math.PI * rotationFactor / 2, 0)),
-        new Vector3(1, 1, 1)
-      )
+      matrix.compose(translation, rotation, scale)
       blades.current!.setMatrixAt(i, matrix)
+
+      i++
     }
-  }, [boundaries, count])
+  }, [instances])
 
   return (
-    <instancedMesh {...props} ref={blades} args={[undefined, undefined, count]}>
-      <TrianglePlaneGeometry nbVSegments={3} />
+    <instancedMesh {...props} ref={blades} args={[undefined, undefined, instances.length]}>
+      <TrianglePlaneGeometry nbVSegments={nbVSegments} />
       <grassMaterial
         ref={grassMaterial}
         side={DoubleSide}
