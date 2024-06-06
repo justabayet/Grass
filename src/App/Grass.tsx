@@ -1,5 +1,5 @@
 import { InstancedMeshProps, ReactThreeFiber, useFrame } from '@react-three/fiber'
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture } from 'three'
 import TrianglePlaneGeometry from '../Components/TrianglePlaneGeometry'
 import { extend } from '@react-three/fiber'
@@ -65,7 +65,7 @@ function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
     }
   })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const width = boundaries[1] - boundaries[0]
     const height = boundaries[3] - boundaries[2]
 
