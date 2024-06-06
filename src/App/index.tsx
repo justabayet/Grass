@@ -4,6 +4,7 @@ import Grass from './Grass'
 // import { Perf } from 'r3f-perf'
 
 function App(): JSX.Element {
+  const size = 20
   return (
     <Canvas
       camera={{
@@ -13,7 +14,7 @@ function App(): JSX.Element {
         position: [- 4, 3, 6]
       }} >
 
-      <Grass boundaries={[-2, 2, -2, 2]} count={1 * 1000} />
+      <Grass boundaries={[-size / 2, size / 2, -size / 2, size / 2]} count={10 * 1000} />
 
       {/* <Ground position={[0, 0, 0]} /> */}
       <OrbitControls />

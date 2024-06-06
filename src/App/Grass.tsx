@@ -1,6 +1,6 @@
 import { InstancedMeshProps, ReactThreeFiber, useFrame } from '@react-three/fiber'
 import { useLayoutEffect, useRef } from 'react'
-import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture } from 'three'
+import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture, Euler } from 'three'
 import TrianglePlaneGeometry from '../Components/TrianglePlaneGeometry'
 import { extend } from '@react-three/fiber'
 
@@ -77,7 +77,7 @@ function Grass({ boundaries, count = 100, ...props }: GrassProps): JSX.Element {
 
       matrix.compose(
         new Vector3(boundaries[0] + offsetWidth, 0, boundaries[2] + offsetHeight),
-        new Quaternion(),
+        new Quaternion().setFromEuler(new Euler(Math.PI / 2)),
         new Vector3(1, 1, 1)
       )
       blades.current!.setMatrixAt(i, matrix)
