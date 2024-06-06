@@ -10,9 +10,9 @@ void main()
   vec3 worldPosition = vec3(modelInstanceMatrix * vec4(0., 0., 0., 1.));
 
   float perlinValue = texture(uPerlinTexture, (worldPosition.xz + uTime) / 50.0).r; // [0;0.5]
-  float uiqueOffset = (perlinValue - 0.25) * 2.0; // [-0.5;0.5]
+  float uniqueOffset = (perlinValue - 0.25) * 2.0; // [-0.5;0.5]
 
-  float oscillation = uiqueOffset * pow(uv.y, 2.0);
+  float oscillation = uniqueOffset * pow(uv.y, 2.0);
 
   vec4 newPos = vec4(position, 1.0);
   newPos.z += -oscillation;
