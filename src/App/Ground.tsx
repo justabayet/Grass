@@ -7,8 +7,8 @@ interface GroundProps extends MeshProps {
 function Ground({ size = 5, ...props }: GroundProps): JSX.Element {
   return (
     <mesh {...props} rotation={[- Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[size, size, 1, 1]} />
-      <meshBasicMaterial color={0xFF8800} transparent opacity={0} />
+      <boxGeometry args={[size, size, 1, 1]} />
+      <meshStandardMaterial color={0xee6eff} />
     </mesh>
   )
 }

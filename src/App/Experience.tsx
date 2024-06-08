@@ -1,11 +1,12 @@
 import { ThreeEvent } from '@react-three/fiber'
-// import Ground from './Ground'
+import Ground from './Ground'
 import GrassDynamic from './GrassDynamic'
 import { Vector2 } from 'three'
 import { useRef } from 'react'
 import { useCanvasTexture } from '../hooks/useCanvasTexture'
 import InteractionPanel from './InteractionPanel'
 import { drawImageX, drawImageY } from '../utils/canvas'
+import { Sky } from '@react-three/drei'
 
 function Experience(): JSX.Element {
   const groundSize = 20
@@ -37,8 +38,11 @@ function Experience(): JSX.Element {
         onPointerOut={() => {
           previousPosition.current = null
         }} />
+      <Ground size={groundSize * 1.05} />
 
-      {/* <Ground size={groundSize} /> */}
+      <ambientLight intensity={0.5} />
+      <spotLight position={[-20, 10, 15]} intensity={10} decay={1} />
+      <Sky distance={45000} sunPosition={[-1, 1, 0]} inclination={0} />
     </group>
   )
 }
