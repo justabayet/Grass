@@ -53,6 +53,7 @@ export const drawImageY: DrawImageFn = ({
   image1,
   image2
 }) => {
+  context.globalCompositeOperation = 'lighten'
   context.globalAlpha = Math.abs(direction.y) / 10
   context.drawImage(
     direction.y > 0 ? image1 : image2,
@@ -71,6 +72,7 @@ export const drawImageX: DrawImageFn = ({
   image1,
   image2
 }) => {
+  context.globalCompositeOperation = 'lighten'
   context.globalAlpha = Math.abs(direction.x) / 10
   context.drawImage(
     direction.x > 0 ? image1 : image2,

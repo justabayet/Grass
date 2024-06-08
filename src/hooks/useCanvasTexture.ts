@@ -3,8 +3,7 @@ import { CanvasTexture, Vector2 } from 'three'
 import { DrawImageFn, createCanvas, glowGreenImage, glowRedImage } from '../utils/canvas'
 
 const DEFAULT_COLOR = '#000000'
-const DIST_TO_INTERPOLATE = 0.02
-const DIST_INTERPOLATION = 0.001
+const DIST_INTERPOLATION = 0.01
 
 interface CanvasProviderProps {
   x?: number
@@ -24,7 +23,6 @@ export const useCanvasTexture = (id: string, { x = 0, drawImage, isVisible = fal
     }
 
     const size = 40
-    context.globalCompositeOperation = 'lighten'
 
     const dist = origin.distanceTo(destination)
     const direction = (destination.clone().sub(origin))
@@ -42,13 +40,11 @@ export const useCanvasTexture = (id: string, { x = 0, drawImage, isVisible = fal
       })
     }
 
-    if (dist > DIST_TO_INTERPOLATE) {
-      const nbSteps = Math.floor(dist / DIST_INTERPOLATION)
-      for (let i = 1; i < nbSteps; i++) {
-        const step = 1 / nbSteps
-        const interPos = origin.clone().lerp(destination, step * i)
-        drawImageInternal(interPos)
-      }
+    const nbSteps = Math.floor(dist / DIST_INTERPOLATION)
+    for (let i = 1; i < nbSteps; i++) {
+      const step = 1 / nbSteps
+      const interPos = origin.clone().lerp(destination, step * i)
+      drawImageInternal(interPos)
     }
     drawImageInternal(destination)
   }, [canvas, drawImage])
