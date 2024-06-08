@@ -23,7 +23,7 @@ function GrassDynamic({ textureInteractionX, textureInteractionY, size = 5, ...p
       const offsetWidth = Math.random() * width
       const offsetHeight = Math.random() * height
 
-      const rotationFactor = (Math.random() - 0.5) * 1
+      const rotationFactor = (Math.random() - 0.5) * 1.5
 
       instances.push({
         translation: new Vector3(boundaries[0] + offsetWidth, 0, boundaries[2] + offsetHeight),
