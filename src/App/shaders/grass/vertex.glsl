@@ -30,7 +30,7 @@ void main()
   vec4 swipeY = texture(uDisplacementTextureY, vGroundUv); // [0; 1]
   float forceY = swipeY.g - swipeY.r; // [-1; 1]
 
-  newPos.x -= forceX * uv.y;
+  newPos.x += forceX * uv.y;
   newPos.z -= forceY * uv.y;
 
   oscillation = clamp(forceY + uniqueOffset, -0.5, 0.5) * pow(uv.y, 2.0);
