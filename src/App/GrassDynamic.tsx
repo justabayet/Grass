@@ -1,10 +1,11 @@
 import { InstancedMeshProps, useFrame } from '@react-three/fiber'
 import { useMemo, useState } from 'react'
-import { Vector3, Quaternion, Euler, CanvasTexture } from 'three'
+import { Quaternion, Euler, CanvasTexture, Vector3 } from 'three'
 import Grass from './Grass'
 
 interface GrassDynamicProps extends InstancedMeshProps {
   size?: number
+  position?: [number, number, number]
   textureInteractionX: CanvasTexture
   textureInteractionY: CanvasTexture
 }
@@ -34,19 +35,32 @@ function GrassDynamic({ textureInteractionX, textureInteractionY, size = 5, ...p
     return instances
   }, [boundaries, count])
 
-  const [segments, setSegments] = useState<number>(3)
+  const [distanceTier, setDistanceTier] = useState<number>(3)
+
+  const center = useMemo(() => {
+    return props.position ? new Vector3(...props.position) : new Vector3()
+  }, [props.position])
 
   useFrame(({ camera }) => {
-    const distance = camera.position.distanceTo(new Vector3())
-    const index = 3 - Math.floor(distance / 20)
-    setSegments(Math.max(1, index))
+    const distance = camera.position.distanceTo(center)
+    const index = Math.floor(distance / 20)
+    setDistanceTier(Math.max(1, Math.min(4, index)))
   })
+
+  const sharedParams = useMemo(() => {
+    return {
+      groundSize: size,
+      textureInteractionX: textureInteractionX,
+      textureInteractionY: textureInteractionY
+    }
+  }, [size, textureInteractionX, textureInteractionY])
 
   return (
     <>
-      {segments == 1 && <Grass instances={instances} groundSize={size} nbVSegments={1} textureInteractionX={textureInteractionX} textureInteractionY={textureInteractionY} {...props} />}
-      {segments == 2 && <Grass instances={instances} groundSize={size} nbVSegments={2} textureInteractionX={textureInteractionX} textureInteractionY={textureInteractionY} {...props} />}
-      {segments == 3 && <Grass instances={instances} groundSize={size} nbVSegments={3} textureInteractionX={textureInteractionX} textureInteractionY={textureInteractionY} {...props} />}
+      {distanceTier == 4 && <Grass instances={instances.slice(0, instances.length / 2)} nbVSegments={1} {...sharedParams} {...props} />}
+      {distanceTier == 3 && <Grass instances={instances} nbVSegments={1} {...sharedParams} {...props} />}
+      {distanceTier == 2 && <Grass instances={instances} nbVSegments={2} {...sharedParams} {...props} />}
+      {distanceTier == 1 && <Grass instances={instances} nbVSegments={3} {...sharedParams} {...props} />}
     </>
   )
 }
