@@ -16,7 +16,7 @@ function Experience(): JSX.Element {
   const { drawTrail: drawSwipeY, texture: textureSwipeY } = useCanvasTexture('canvas-swipe-y', { x: 300, drawImage: drawImageY })
 
   return (
-    <group position={[7, 0, 0]}>
+    <group position={[0, 0, 0]}>
       <GrassDynamic
         size={groundSize}
         textureInteractionX={textureSwipeX}
