@@ -3,8 +3,6 @@ uniform vec3 uTipColor;
 varying vec2 vUv;
 varying float vOscillation;
 
-#define MIX_RATIO 0.2
-
 void main()
 {
     vec3 color = mix(uBaseColor, uTipColor, vUv.y * vUv.y);
