@@ -1,6 +1,6 @@
 import { InstancedMeshProps, ReactThreeFiber, useFrame } from '@react-three/fiber'
 import { useLayoutEffect, useRef } from 'react'
-import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture } from 'three'
+import { type InstancedMesh, Matrix4, Vector3, Quaternion, DoubleSide, ShaderMaterial, Color, RepeatWrapping, Texture, CanvasTexture } from 'three'
 import TrianglePlaneGeometry from '../Components/TrianglePlaneGeometry'
 import { extend } from '@react-three/fiber'
 
@@ -14,6 +14,9 @@ interface GrassMaterial extends ShaderMaterial {
   uBaseColor: Color
   uTipColor: Color
   uPerlinTexture: Texture
+  uDisplacementTextureX: CanvasTexture
+  uDisplacementTextureY: CanvasTexture
+  uGroundSize: number
 }
 
 const defaultBaseColor = new Color(0.3, .0, 1.0)
@@ -24,7 +27,10 @@ const GrassMaterial = shaderMaterial(
     uTime: 0,
     uBaseColor: defaultBaseColor,
     uTipColor: defaultTipColor,
-    uPerlinTexture: null
+    uPerlinTexture: null,
+    uDisplacementTextureX: null,
+    uDisplacementTextureY: null,
+    uGroundSize: 1
   },
   grassVertexShader,
   grassFragmentShader
@@ -48,9 +54,12 @@ interface GrassProps extends InstancedMeshProps {
     scale: Vector3
   }[]
   nbVSegments: number
+  textureInteractionX: CanvasTexture
+  textureInteractionY: CanvasTexture
+  groundSize: number
 }
 
-function Grass({ instances, nbVSegments, ...props }: GrassProps): JSX.Element {
+function Grass({ groundSize, textureInteractionX, textureInteractionY, instances, nbVSegments, ...props }: GrassProps): JSX.Element {
   const blades = useRef<InstancedMesh>(null)
   const grassMaterial = useRef<GrassMaterial>(null)
   const { baseColor, tipColor } = useControls({
@@ -88,8 +97,11 @@ function Grass({ instances, nbVSegments, ...props }: GrassProps): JSX.Element {
         ref={grassMaterial}
         side={DoubleSide}
         uPerlinTexture={perlinTexture}
+        uDisplacementTextureX={textureInteractionX}
+        uDisplacementTextureY={textureInteractionY}
         uBaseColor={baseColor}
-        uTipColor={tipColor} />
+        uTipColor={tipColor}
+        uGroundSize={groundSize} />
     </instancedMesh>
   )
 }

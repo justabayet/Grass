@@ -1,50 +1,45 @@
-import { useMemo, useState } from 'react'
-import { Vector3, Quaternion, Euler } from 'three'
-import Grass from './Grass'
-import { useFrame } from '@react-three/fiber'
-
+import { ThreeEvent } from '@react-three/fiber'
+// import Ground from './Ground'
+import GrassDynamic from './GrassDynamic'
+import { Vector2 } from 'three'
+import { useRef } from 'react'
+import { useCanvasTexture } from '../hooks/useCanvasTexture'
+import InteractionPanel from './InteractionPanel'
+import { drawImageX, drawImageY } from '../utils/canvas'
 
 function Experience(): JSX.Element {
-  const size = 20
+  const groundSize = 20
 
-  const boundaries: [number, number, number, number] = useMemo(() => [-size / 2, size / 2, -size / 2, size / 2], [])
-  const count = 10 * 1000
+  const previousPosition = useRef<Vector2 | null>(null)
 
-  const instances = useMemo(() => {
-    const instances = []
-    const width = boundaries[1] - boundaries[0]
-    const height = boundaries[3] - boundaries[2]
-
-    for (let i = 0; i < count; i++) {
-
-      const offsetWidth = Math.random() * width
-      const offsetHeight = Math.random() * height
-
-      const rotationFactor = (Math.random() - 0.5) * 1
-
-      instances.push({
-        translation: new Vector3(boundaries[0] + offsetWidth, 0, boundaries[2] + offsetHeight),
-        rotation: new Quaternion().setFromEuler(new Euler(0, Math.PI * rotationFactor / 2, 0)),
-        scale: new Vector3(1, 1, 1)
-      })
-    }
-    return instances
-  }, [boundaries, count])
-
-  const [segments, setSegments] = useState<number>(3)
-
-  useFrame(({ camera }) => {
-    const distance = camera.position.distanceTo(new Vector3())
-    const index = 3 - Math.floor(distance / 20)
-    setSegments(Math.max(1, index))
-  })
+  const { drawTrail: drawSwipeX, texture: textureSwipeX } = useCanvasTexture('canvas-swipe-x', { drawImage: drawImageX })
+  const { drawTrail: drawSwipeY, texture: textureSwipeY } = useCanvasTexture('canvas-swipe-y', { x: 300, drawImage: drawImageY })
 
   return (
-    <>
-      {segments == 1 && <Grass instances={instances} nbVSegments={1} />}
-      {segments == 2 && <Grass instances={instances} nbVSegments={2} />}
-      {segments == 3 && <Grass instances={instances} nbVSegments={3} />}
-    </>
+    <group position={[7, 0, 0]}>
+      <GrassDynamic
+        size={groundSize}
+        textureInteractionX={textureSwipeX}
+        textureInteractionY={textureSwipeY} />
+
+      <InteractionPanel
+        size={groundSize}
+        position={[0, 1.3, 0]}
+        onPointerMove={(event: ThreeEvent<PointerEvent>) => {
+          if (event.uv) {
+            if (previousPosition.current != null) {
+              drawSwipeX(previousPosition.current, event.uv)
+              drawSwipeY(previousPosition.current, event.uv)
+            }
+            previousPosition.current = event.uv
+          }
+        }}
+        onPointerOut={() => {
+          previousPosition.current = null
+        }} />
+
+      {/* <Ground size={groundSize} /> */}
+    </group>
   )
 }
 
