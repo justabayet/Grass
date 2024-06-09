@@ -44,20 +44,20 @@ function GrassDynamic({ textureInteractionX, textureInteractionY, size = 5, ...p
   useFrame(({ camera }) => {
     const distance = camera.position.distanceTo(center)
     const index = Math.floor(distance / 20)
-    setDistanceTier(Math.max(1, Math.min(4, index)))
+    setDistanceTier(Math.max(1, Math.min(3, index)))
   })
 
   const sharedParams = useMemo(() => {
     return {
       groundSize: size,
       textureInteractionX: textureInteractionX,
-      textureInteractionY: textureInteractionY
+      textureInteractionY: textureInteractionY,
+      center
     }
-  }, [size, textureInteractionX, textureInteractionY])
+  }, [size, textureInteractionX, textureInteractionY, center])
 
   return (
     <>
-      {distanceTier == 4 && <Grass instances={instances.slice(0, instances.length / 2)} nbVSegments={1} {...sharedParams} {...props} />}
       {distanceTier == 3 && <Grass instances={instances} nbVSegments={1} {...sharedParams} {...props} />}
       {distanceTier == 2 && <Grass instances={instances} nbVSegments={2} {...sharedParams} {...props} />}
       {distanceTier == 1 && <Grass instances={instances} nbVSegments={3} {...sharedParams} {...props} />}

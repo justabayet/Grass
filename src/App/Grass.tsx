@@ -57,9 +57,10 @@ interface GrassProps extends InstancedMeshProps {
   textureInteractionX: CanvasTexture
   textureInteractionY: CanvasTexture
   groundSize: number
+  center: Vector3
 }
 
-function Grass({ groundSize, textureInteractionX, textureInteractionY, instances, nbVSegments, ...props }: GrassProps): JSX.Element {
+function Grass({ groundSize, textureInteractionX, textureInteractionY, instances, nbVSegments, center, ...props }: GrassProps): JSX.Element {
   const blades = useRef<InstancedMesh>(null)
   const grassMaterial = useRef<GrassMaterial>(null)
   const { baseColor, tipColor } = useControls({
@@ -72,9 +73,36 @@ function Grass({ groundSize, textureInteractionX, textureInteractionY, instances
     texture.wrapT = RepeatWrapping
   })
 
-  useFrame(({ clock }) => {
+  const MIN_COUNT_FACTOR = 0.1
+
+  const MIN_INSTANCES_COUNT = instances.length * MIN_COUNT_FACTOR
+  const MAX_INSTANCES_COUNT = instances.length
+  const RANGE_INTANCES = MAX_INSTANCES_COUNT - MIN_INSTANCES_COUNT
+
+  const MIN_DISTANCE = 20
+  const MAX_DISTANCE = 80
+  const RANGE_DISTANCE = MAX_DISTANCE - MIN_DISTANCE
+
+  useFrame(({ clock, camera }) => {
     if (grassMaterial.current != null) {
       grassMaterial.current.uTime = clock.elapsedTime
+    }
+
+    if (blades.current != null) {
+      const distance = camera.position.distanceTo(center)
+
+      let count: number
+      if (distance < MIN_DISTANCE) {
+        count = MAX_INSTANCES_COUNT
+      } else if (distance > MAX_DISTANCE) {
+        count = MIN_INSTANCES_COUNT
+      } else {
+        const currentRangeDistance = distance - MIN_DISTANCE
+        const factor = 1 - (currentRangeDistance / RANGE_DISTANCE)
+        count = MIN_INSTANCES_COUNT + RANGE_INTANCES * factor
+      }
+
+      blades.current.count = count
     }
   })
 
